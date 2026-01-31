@@ -13,15 +13,15 @@ const tools = [
   },
   {
     id: 'newline-unescape',
-    name: '\\n 转换行',
-    description: '将文本中的 \\n 转换为真实换行',
+    name: 'Markdown Preview',
+    description: '将 \\n 转为换行并预览 Markdown',
     icon: '↵',
     color: '#43e97b'
   },
   {
     id: 'json-formatter',
     name: 'JSON 格式化',
-    description: '格式化、验证和美化 JSON 数据',
+    description: '一键去掉转义符并格式化 JSON',
     icon: '📝',
     color: '#f093fb'
   },

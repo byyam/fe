@@ -69,12 +69,18 @@ const historyPreview = (text) => {
   const lines = text.split('\n').slice(0, 2).join('\n')
   return lines.length > 80 ? lines.slice(0, 80) + '…' : lines
 }
+
+// Markdown 放大：点击后左侧消失，Markdown 占满整行
+const markdownExpanded = ref(false)
+const toggleMarkdownExpand = () => {
+  markdownExpanded.value = !markdownExpanded.value
+}
 </script>
 
 <template>
   <div class="container">
-    <h1>\n 转换行工具</h1>
-    <p class="description">在输入框中粘贴含有字面量 <code>\n</code> 的文本，下方会实时显示将 <code>\n</code> 转为真实换行的结果。</p>
+    <h1>Markdown Preview</h1>
+    <p class="description">在输入框中粘贴含有字面量 <code>\n</code> 的文本，下方会实时显示换行结果与 Markdown 预览。</p>
 
     <div class="converter-section">
       <div class="input-group">
@@ -91,20 +97,25 @@ const historyPreview = (text) => {
       </div>
 
       <template v-if="convertedText">
-        <!-- 1. 仅换行结果 -->
-        <div class="result-section">
-          <div class="result-header">
-            <label>1. 转换结果（仅换行）</label>
-            <button @click="copyToClipboard(convertedText)" class="btn-copy">复制</button>
+        <div class="result-row" :class="{ 'markdown-expanded': markdownExpanded }">
+          <!-- 左：仅换行结果（放大时隐藏） -->
+          <div v-show="!markdownExpanded" class="result-section">
+            <div class="result-header">
+              <label>转换结果（仅换行）</label>
+              <button @click="copyToClipboard(convertedText)" class="btn-copy">复制</button>
+            </div>
+            <pre class="result-pre">{{ convertedText }}</pre>
           </div>
-          <pre class="result-pre">{{ convertedText }}</pre>
-        </div>
-        <!-- 2. Markdown 预览 -->
-        <div class="result-section result-section-markdown">
-          <div class="result-header">
-            <label>2. Markdown 预览</label>
+          <!-- 右：Markdown 预览 -->
+          <div class="result-section result-section-markdown">
+            <div class="result-header">
+              <label>Markdown 预览</label>
+              <button type="button" @click="toggleMarkdownExpand" class="btn-expand">
+                {{ markdownExpanded ? '收起' : '放大' }}
+              </button>
+            </div>
+            <div class="markdown-preview" v-html="markdownHtml" />
           </div>
-          <div class="markdown-preview" v-html="markdownHtml" />
         </div>
       </template>
 
@@ -134,7 +145,7 @@ const historyPreview = (text) => {
 
 <style scoped>
 .container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -224,8 +235,26 @@ h1 {
   border-color: #3498db;
 }
 
-.result-section {
+.result-row {
+  display: flex;
+  gap: 16px;
   margin-top: 20px;
+  min-height: 0;
+}
+
+.result-row .result-section {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.result-row.markdown-expanded .result-section-markdown {
+  flex: 1 1 100%;
+}
+
+.result-section {
+  margin-top: 0;
   padding: 15px;
   background: white;
   border-radius: 6px;
@@ -273,23 +302,53 @@ h1 {
   white-space: pre-wrap;
   word-break: break-word;
   color: #2c3e50;
+  flex: 1;
+  min-height: 200px;
   max-height: 400px;
   overflow-y: auto;
 }
 
 .result-section-markdown {
   border-left-color: #27ae60;
-  margin-top: 16px;
+}
+
+.result-section-markdown .result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-expand {
+  padding: 6px 12px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.3s;
+}
+
+.btn-expand:hover {
+  background: #219a52;
+}
+
+.result-section-markdown .markdown-preview {
+  flex: 1;
+  min-height: 200px;
+  max-height: 400px;
 }
 
 .markdown-preview {
+  margin: 0;
   padding: 12px;
   background: #fff;
   border-radius: 4px;
   font-size: 14px;
   line-height: 1.6;
   color: #2c3e50;
-  max-height: 500px;
   overflow-y: auto;
 }
 
@@ -429,5 +488,11 @@ h1 {
 .btn-remove {
   background: #e74c3c;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .result-row {
+    flex-direction: column;
+  }
 }
 </style>

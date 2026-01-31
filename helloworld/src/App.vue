@@ -3,13 +3,14 @@ import { ref } from 'vue'
 import Home from './components/Home.vue'
 import TimeConverter from './components/TimeConverter.vue'
 import NewlineUnescape from './components/NewlineUnescape.vue'
+import JsonFormatter from './components/JsonFormatter.vue'
 import Placeholder from './components/Placeholder.vue'
 
 const currentPage = ref('home')
 
 const toolNames = {
   'time-converter': 'Unix 时间转换',
-  'newline-unescape': '\\n 转换行',
+  'newline-unescape': 'Markdown Preview',
   'json-formatter': 'JSON 格式化',
   'url-encoder': 'URL 编解码',
   'base64-converter': 'Base64 编解码',
@@ -38,6 +39,7 @@ const goHome = () => {
     <Home v-if="currentPage === 'home'" @navigate="navigateTo" />
     <TimeConverter v-else-if="currentPage === 'time-converter'" />
     <NewlineUnescape v-else-if="currentPage === 'newline-unescape'" />
+    <JsonFormatter v-else-if="currentPage === 'json-formatter'" />
     <Placeholder v-else :tool-name="toolNames[currentPage] || '工具'" />
   </div>
 </template>
